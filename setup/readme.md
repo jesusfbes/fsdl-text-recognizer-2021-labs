@@ -5,7 +5,7 @@ Specifically, NVIDIA GPUs, or Google TPUs.
 
 If you have access to a computer that has an NVIDIA GPU and runs Linux, you're welcome to [set it up](#Local) for local user.
 
-If you don't, you can compute using [Goole Colab](#Colab).
+If you don't, you can compute using [Google Colab](#Colab).
 
 If you'd like to use Google Cloud Platform, we have a [tutorial](https://docs.google.com/document/d/1mSB_p1Chxg6IGYbuRxgPSA3Ps6BjhBZV7Ti3W_Qx0Ws/) for setting up an AI Platform Jupyter Lab instance for computing, which works quite well.
 
@@ -30,7 +30,7 @@ Now, paste the following into a cell and run it:
 # FSDL Spring 2021 Setup
 !git clone https://github.com/full-stack-deep-learning/fsdl-text-recognizer-2021-labs
 %cd fsdl-text-recognizer-2021-labs
-!pip install pytorch_lightning
+!pip3 install boltons wandb pytorch_lightning==1.1.4 pip install torch==1.7.1+cu110 torchvision==0.8.2+cu110 torchaudio==0.7.2 torchtext==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html
 %env PYTHONPATH=.:$PYTHONPATH
 ```
 

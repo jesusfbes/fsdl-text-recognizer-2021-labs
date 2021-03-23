@@ -34,6 +34,7 @@ def _setup_parser():
     # Basic arguments
     parser.add_argument("--data_class", type=str, default="MNIST")
     parser.add_argument("--model_class", type=str, default="MLP")
+    parser.add_argument("--load_checkpoint", type=str, default=None)
 
     # Get the data and model classes, so that we can add their specific arguments
     temp_args, _ = parser.parse_known_args()
@@ -44,7 +45,7 @@ def _setup_parser():
     data_group = parser.add_argument_group("Data Args")
     data_class.add_to_argparse(data_group)
 
-    model_group = parser.add_argument_group("Data Args")
+    model_group = parser.add_argument_group("Model Args")
     model_class.add_to_argparse(model_group)
 
     lit_model_group = parser.add_argument_group("LitModel Args")
@@ -71,14 +72,19 @@ def main():
     model = model_class(data_config=data.config(), args=args)
 
     if args.loss not in ('ctc', 'transformer'):
-        lit_model = lit_models.BaseLitModel(model, args=args)
+        lit_model_class = lit_models.BaseLitModel
 
-    loggers = [pl.loggers.TensorBoardLogger("training/logs")]
+    if args.load_checkpoint is not None:
+        lit_model = lit_model_class.load_from_checkpoint(args.load_checkpoint, args=args, model=model)
+    else:
+        lit_model = lit_model_class(args=args, model=model)
+
+    logger = pl.loggers.TensorBoardLogger("training/logs")
 
     callbacks = [pl.callbacks.EarlyStopping(monitor="val_loss", mode="min", patience=10)]
 
     args.weights_summary = "full"  # Print full summary of the model
-    trainer = pl.Trainer.from_argparse_args(args, callbacks=callbacks, logger=loggers, default_root_dir="training/logs")
+    trainer = pl.Trainer.from_argparse_args(args, callbacks=callbacks, logger=logger, default_root_dir="training/logs")
 
     trainer.tune(lit_model, datamodule=data)  # If passing --auto_lr_find, this will set learning rate
 
